@@ -59,7 +59,49 @@ The content of UIPATH_FILE :
 
 ## example
 
+if no parameter is defined the default api is called :
+
+    GET /api/Status/Get : check the status of the orchestrator api
+
+        ./pyuipathcloudapi.py
+        {"Code": 200, "Reason": "OK"}
+
+some apis need a token to be called and in this case you can add -g parameter to generate the token :
+
+    GET /odata/Machines : get the list of machines
+
     ./pyuipathcloudapi.py -a /odata/Machines -g
+
+    {'@odata.context': 'https://cloud.uipath.com/myorg/mytenant/orchestrator_/odata/$metadata#Machines/UiPath.Server.Configuration.OData.ExtendedMachineDto', '@odata.count': 1, \
+    'value': [{'@odata.type': '#UiPath.Server.Configuration.OData.ExtendedMachineDto', 'LicenseKey': None, 'Name': "your_email's workspace machine", 'Description': None, 'Type': \
+    'Template', 'Scope': 'PersonalWorkspace', 'NonProductionSlots': 0, 'UnattendedSlots': 0, 'HeadlessSlots': 0, 'TestAutomationSlots': 0, 'AutomationCloudSlots': 0, \
+    'Key': 'zzzzzzzz-z999-9999-9999-zzzzzzzzzzzz', 'AutoScalingProfile': None, 'AutomationType': 'Any', 'TargetFramework': 'Any', 'ClientSecret': None, 'Id': 9999999, \
+        'RobotVersions': [], 'RobotUsers': [], 'UpdatePolicy': None, 'Tags': [], 'MaintenanceWindow': None}]}
+
+
+    POST /odata/Roles : create a new role
+
+    ./pyuipathcloudapi.py -a /odata/Roles -g -J role.json -m POST
+    {'message': 'Error : 201 Created'}
+
+    PUT /odata/Roles({id}) : update a role seems not to work for now something special to handle.
+
+
+    DELETE /odata/Roles({id}) : delete a role
+
+    ./pyuipathcloudapi.py -a "/odata/Roles(99999999)" -g -m DELETE
+    {}
+
+
+    PATCH /odata/Users({id}) : update partially an user information
+
+    ./pyuipathcloudapi.py -a "/odata/Users(9999999)" -g -m PATCH -J user_patch.json
+    {"Code": 200, "Reason": "OK"}
+
+## known issues
+
+For now I have some issues with PUT that seems to not work even using curl (not found the correct way to update an existing role).
+The PATCH method returns 200 success but no modification taken in account ? but we can see the last modification date updated!
 
 ## TODO
 

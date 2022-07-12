@@ -1,0 +1,8 @@
+{
+  "Name": "myrole",
+  "DisplayName": "myrole",
+  "Type": "Tenant",
+  "Groups": "Everyone",
+  "IsStatic": true,
+  "IsEditable": true
+}

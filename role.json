@@ -1,0 +1,16 @@
+{
+  "Name": "myrole",
+  "DisplayName": "myrole",
+  "Type": "Tenant",
+  "IsStatic": true,
+  "IsEditable": true,
+  "Permissions": [
+    {
+      "Name": "Myapp",
+      "IsGranted": true,
+      "RoleId": 0,
+      "Scope": "Global",
+      "Id": 0
+    }
+  ]
+}

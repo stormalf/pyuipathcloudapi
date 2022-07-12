@@ -7,16 +7,56 @@ import argparse
 import os
 
 '''
-pyuipathcloudapi.py is to be used by other python modules to automate uipath cloud api usage.
+pyuipathcloudapi.py is to be used by other python modules to automate uipath cloud orchestrator api usage.
 it could be called in command line.
-See uipath cloud official references to get the correct Api URL and method to use :
+See uipath cloud official references to get the correct Api URL and method to use : https://docs.uipath.com/orchestrator/reference/api-references 
 
+Examples:
+
+if no parameter is defined the default api is called : 
+    
+GET /api/Status/Get : check the status of the orchestrator api
+
+        ./pyuipathcloudapi.py
+        {"Code": 200, "Reason": "OK"}
+
+some apis need a token to be called and in this case you can add -g parameter to generate the token :
+
+GET /odata/Machines : get the list of machines
+
+    ./pyuipathcloudapi.py -a /odata/Machines -g
+
+    {'@odata.context': 'https://cloud.uipath.com/myorg/mytenant/orchestrator_/odata/$metadata#Machines/UiPath.Server.Configuration.OData.ExtendedMachineDto', '@odata.count': 1, \
+    'value': [{'@odata.type': '#UiPath.Server.Configuration.OData.ExtendedMachineDto', 'LicenseKey': None, 'Name': "your_email's workspace machine", 'Description': None, 'Type': \
+    'Template', 'Scope': 'PersonalWorkspace', 'NonProductionSlots': 0, 'UnattendedSlots': 0, 'HeadlessSlots': 0, 'TestAutomationSlots': 0, 'AutomationCloudSlots': 0, \
+    'Key': 'zzzzzzzz-z999-9999-9999-zzzzzzzzzzzz', 'AutoScalingProfile': None, 'AutomationType': 'Any', 'TargetFramework': 'Any', 'ClientSecret': None, 'Id': 9999999, \
+        'RobotVersions': [], 'RobotUsers': [], 'UpdatePolicy': None, 'Tags': [], 'MaintenanceWindow': None}]}
+
+
+POST /odata/Roles : create a new role
+
+    ./pyuipathcloudapi.py -a /odata/Roles -g -J role.json -m POST
+    {'message': 'Error : 201 Created'}
+
+PUT /odata/Roles({id}) : update a role seems not to work for now something special to handle.
+
+
+DELETE /odata/Roles({id}) : delete a role
+
+    ./pyuipathcloudapi.py -a "/odata/Roles(99999999)" -g -m DELETE
+    {}
+
+
+PATCH /odata/Users({id}) : update partially an user information
+
+    ./pyuipathcloudapi.py -a "/odata/Users(9999999)" -g -m PATCH -J user_patch.json
+    {"Code": 200, "Reason": "OK"}
     
 '''
 
 __version__ = "1.0.0"
 
-ALLOWED_METHODS = ["DELETE", "GET", "POST", "PUT"]
+ALLOWED_METHODS = ["DELETE", "GET", "POST", "PUT", "PATCH"]
 URL = "https://cloud.uipath.com"
 NO_CONTENT = 204
 HEADER_JSON = "application/json"
@@ -139,9 +179,17 @@ class uipathcloudApi():
                     response = requests.put(apiurl,  headers=header)
                 else:
                     contents = open(self.json, 'rb') 
-                    header['Content-Type'] = HEADER_JSON                   
+                    header['Content-Type'] = HEADER_JSON     
                     response = requests.put(apiurl,  headers=header, data=contents)
                     contents.close()
+            elif self.method == "PATCH":
+                if self.json == '':
+                    response = requests.patch(apiurl,  headers=header)
+                else:
+                    contents = open(self.json, 'rb') 
+                    header['Content-Type'] = HEADER_JSON     
+                    response = requests.patch(apiurl,  headers=header, data=contents)
+                    contents.close()                    
             elif self.method == "DELETE":
                 #raise Exception("DELETE not implemented yet")
                 response = requests.delete(apiurl,  headers=header)  
@@ -155,8 +203,8 @@ class uipathcloudApi():
             #print(response.headers)    
             try:
                 response = response.json()
-            except:
-                response = "{}"  
+            except :
+                response = '{"Code": ' + str(response.status_code) + ', "Reason": "' + response.reason + '"}'  
         return response
 
 def pyuipathcloudapi(args):
