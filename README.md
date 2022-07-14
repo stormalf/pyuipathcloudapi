@@ -16,7 +16,7 @@ the api url is build with :
 
     example :
 
-        https://cloud.uipath.com/myorg/mytenant/orchestrator_api/odata/Machines
+        https://cloud.uipath.com/myorg/mytenant/orchestrator_/odata/Machines
 
 ## environment variables
 
